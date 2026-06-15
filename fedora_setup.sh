@@ -17,6 +17,7 @@ PACKAGES=(
     kate
     steam
     wine
+    wine-devel
     btrfs-assistant
     ethtool
 )
@@ -93,9 +94,9 @@ EOF
 dnf makecache
 dnf install -y Cider
 
-echo "==> Installing CKAN (KSP Mod Manager)..."
-dnf config-manager addrepo --from-repofile https://ksp-ckan.s3-us-west-2.amazonaws.com/rpm/stable/ckan_stable.repo
-dnf install -y ckan
+# echo "==> Installing CKAN (KSP Mod Manager)..."
+# dnf config-manager addrepo --from-repofile https://ksp-ckan.s3-us-west-2.amazonaws.com/rpm/stable/ckan_stable.repo
+# dnf install -y ckan
 
 echo "==> Configuring Wake-on-LAN (WoL)..."
 ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
