@@ -68,6 +68,10 @@ echo "==> Installing Faugus Launcher..."
 dnf copr enable -y faugus/faugus-launcher
 dnf install -y faugus-launcher
 
+echo "==> Installing LUG-Helper..."
+dnf copr enable jackgreiner/lug-helper
+dnf install lug-helper
+
 echo "==> Installing LACT (AMD Linux App)..."
 dnf copr enable -y ilyaz/LACT
 dnf install -y lact
