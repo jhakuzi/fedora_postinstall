@@ -19,7 +19,7 @@ PACKAGES=(
     wine
     wine-devel
     btrfs-assistant
-    ethtool
+    vlc
 )
 
 echo "==> Enabling RPM Fusion..."
