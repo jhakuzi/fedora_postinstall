@@ -42,8 +42,8 @@ echo "==> 1/5: CONFIGURING REPOSITORIES..."
 
 # Standard Repos
 dnf install -y \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \  # RPM Fusion free
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm # RPM Fusion non-free
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 # COPR Repos
 dnf copr enable -y bieszczaders/kernel-cachyos
@@ -69,6 +69,18 @@ EOF
 
 echo "==> Updating system metadata..."
 dnf update -y
+
+
+echo "==> 1.5/5: INSTALLING FULL MULTIMEDIA CODECS & DRIVERS..."
+
+echo "  -> Swapping to full ffmpeg..."
+dnf swap -y ffmpeg-free ffmpeg --allowerasing || FAILED_DNF+=("ffmpeg (swap)")
+
+echo "  -> Installing multimedia group..."
+dnf install -y @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin || FAILED_DNF+=("@multimedia group")
+
+echo "  -> Installing freeworld hardware acceleration drivers..."
+dnf install -y mesa-va-drivers-freeworld || FAILED_DNF+=("mesa-va-drivers-freeworld")
 
 
 echo "==> 2/5: INSTALLING DNF PACKAGES..."
@@ -204,7 +216,7 @@ done
 # Final report
 echo ""
 echo "================================================================"
-echo "                   INSTALLATION SUMMARY                         "
+echo "                    INSTALLATION SUMMARY                        "
 echo "================================================================"
 
 if [ ${#FAILED_DNF[@]} -eq 0 ] && [ ${#FAILED_FLATPAKS[@]} -eq 0 ]; then
