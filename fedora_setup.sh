@@ -64,6 +64,10 @@ chmod u+rx /etc/kernel/postinst.d/99-default
 echo "==> Rebuilding initramfs with new kernel settings..."
 dracut -f --regenerate-all
 
+echo "==> Installing xpadneo..."
+dnf copr enable sentry/xpadneo
+dnf install xpadneo
+
 echo "==> Installing Faugus Launcher..."
 dnf copr enable -y faugus/faugus-launcher
 dnf install -y faugus-launcher
@@ -84,6 +88,10 @@ dnf install -y xpadneo
 echo "==> Installing Plasma AppGrid..."
 dnf copr enable -y scujas/plasma-applet-appgrid
 dnf install -y plasma-applet-appgrid
+
+echo "==> Insalling Opentrack..."
+dnf copr enable jhakuzi/opentrack-wine
+dnf install opentrack
 
 echo "==> Installing Cider..."
 rpm --import https://repo.cider.sh/RPM-GPG-KEY
