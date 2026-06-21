@@ -1,28 +1,28 @@
 #!/bin/bash
 set -eu
 
-# Check for root upfront so we don't need sudo inside
+# Check for root/sudo
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run as root or with sudo."
     exit 1
 fi
 
-# Initialize arrays to track failures
+# Arrays for failures
 FAILED_DNF=()
 FAILED_FLATPAKS=()
 
-# Function to dynamically fetch and install the latest RPM from a GitHub repo
+# Function to fetch and install the latest .rpm from github repo
 install_latest_github_rpm() {
     local REPO=$1
     echo "  -> Fetching latest release for $REPO..."
 
-    # Query the GitHub API for the latest release and use jq to extract the .rpm download URL
-    # We use 'head -n 1' just in case there are multiple RPMs (e.g., debug or different architectures)
+    # Query the github api for the latest release and extract the .rpm download url
+    # Use 'head -n 1' in case there are multiple .rpm files
     local RPM_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | \
                     jq -r '.assets[] | select(.name | endswith(".rpm")) | .browser_download_url' | \
                     grep -i -E "x86_64|x64|amd64" | head -n 1)
 
-    # Fallback in case the grep filtered everything out (if the dev didn't put x86_64 in the filename)
+    # Fallback if grep filtered everything
     if [ -z "$RPM_URL" ]; then
         RPM_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | \
                   jq -r '.assets[] | select(.name | endswith(".rpm")) | .browser_download_url' | \
@@ -74,7 +74,7 @@ dnf update -y
 echo "==> 2/5: INSTALLING DNF PACKAGES..."
 
 PACKAGES=(
-    # Core Utilities & Apps
+    # Standard Apps
     btop
     fastfetch
     thunderbird
@@ -88,8 +88,8 @@ PACKAGES=(
     jq
     curl
     krita
-    flatpak  # Ensuring flatpak is present for the next step
-
+    flatpak
+    
     # CachyOS Kernel
     kernel-cachyos
     kernel-cachyos-devel-matched
@@ -99,7 +99,7 @@ PACKAGES=(
     scx-tools
     scx-manager
 
-    # Third-Party / COPR Apps
+    # COPR Apps
     faugus-launcher
     lug-helper
     lact
@@ -110,12 +110,12 @@ PACKAGES=(
     Sunshine
 )
 
-# Using forgiving flags so one broken package doesn't abort the entire run
+# Using forgiving flags so one broken package doesnt abort the entire run
 dnf install -y --setopt=strict=0 --skip-broken "${PACKAGES[@]}" || true
 
 echo "==> 2.5/5: INSTALLING DYNAMIC GITHUB RPMs..."
 
-# Provide the "DeveloperName/RepoName"
+# Flatpaks
 install_latest_github_rpm "Vencord/Vesktop" # Vesktop (Discord)
 install_latest_github_rpm "rmcrackan/libation" # Libation for Audible
 install_latest_github_rpm "rustdesk/rustdesk" # Rustdesk for remote
@@ -192,7 +192,7 @@ echo "==> 5/5: CLEANUP & VERIFICATION..."
 dnf autoremove -y || true
 dnf clean all || true
 
-# Verify DNF packages (ignoring URLs or special strings)
+# Verify dnf packages
 for pkg in "${PACKAGES[@]}"; do
     if [[ "$pkg" != http* ]] && [[ "$pkg" != *"/"* ]]; then
         if ! rpm -q "$pkg" &> /dev/null; then
@@ -201,7 +201,7 @@ for pkg in "${PACKAGES[@]}"; do
     fi
 done
 
-# Print the final report
+# Final report
 echo ""
 echo "================================================================"
 echo "                   INSTALLATION SUMMARY                         "
