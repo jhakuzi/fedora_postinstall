@@ -107,9 +107,9 @@ dnf install -y "${PACKAGES[@]}"
 echo "==> 2.5/5: INSTALLING DYNAMIC GITHUB RPMs..."
 
 # Provide the "DeveloperName/RepoName"
-install_latest_github_rpm "Vencord/Vesktop"
-install_latest_github_rpm "rmcrackan/libation"
-install_latest_github_rpm "rustdesk/rustdesk"
+install_latest_github_rpm "Vencord/Vesktop" # Vesktop (Discord)
+install_latest_github_rpm "rmcrackan/libation" # Libation for Audible
+install_latest_github_rpm "rustdesk/rustdesk" # Rustdesk for remote
 
 
 echo "==> 3/5: INSTALLING FLATPAKS..."
@@ -119,10 +119,10 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 
 FLATPAKS=(
     # Adjust these App IDs to your liking
-    it.mijorus.gearlever
-    dev.goats.xivlauncher
-    com.teamspeak.TeamSpeak
-    io.github.flattool.Warehouse
+    it.mijorus.gearlever # Gear Lever
+    dev.goats.xivlauncher # XIV Launcher
+    com.teamspeak.TeamSpeak # Teamspeak
+    io.github.flattool.Warehouse # Warehouse
 )
 
 echo "  -> Installing Flatpak applications..."
