@@ -7,6 +7,32 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+# Function to dynamically fetch and install the latest RPM from a GitHub repo
+install_latest_github_rpm() {
+    local REPO=$1
+    echo "  -> Fetching latest release for $REPO..."
+
+    # Query the GitHub API for the latest release and use jq to extract the .rpm download URL
+    # We use 'head -n 1' just in case there are multiple RPMs (e.g., debug or different architectures)
+    local RPM_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | \
+                    jq -r '.assets[] | select(.name | endswith(".rpm")) | .browser_download_url' | \
+                    grep -i -E "x86_64|x64|amd64" | head -n 1)
+
+    # Fallback in case the grep filtered everything out (if the dev didn't put x86_64 in the filename)
+    if [ -z "$RPM_URL" ]; then
+        RPM_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | \
+                  jq -r '.assets[] | select(.name | endswith(".rpm")) | .browser_download_url' | \
+                  head -n 1)
+    fi
+
+    if [ -n "$RPM_URL" ] && [ "$RPM_URL" != "null" ]; then
+        echo "  -> Downloading and installing: $RPM_URL"
+        dnf install -y "$RPM_URL"
+    else
+        echo "  -> WARNING: Could not find a valid .rpm file in the latest release for $REPO!"
+    fi
+}
+
 echo "==> 1/5: CONFIGURING REPOSITORIES..."
 
 # Standard Repos
@@ -53,6 +79,8 @@ PACKAGES=(
     wine
     btrfs-assistant
     vlc
+    jq
+    curl
     flatpak  # Ensuring flatpak is present for the next step
     
     # CachyOS Kernel
@@ -76,6 +104,13 @@ PACKAGES=(
 
 dnf install -y "${PACKAGES[@]}"
 
+echo "==> 2.5/5: INSTALLING DYNAMIC GITHUB RPMs..."
+
+# Provide the "DeveloperName/RepoName"
+install_latest_github_rpm "Vencord/Vesktop"
+install_latest_github_rpm "rmcrackan/libation"
+install_latest_github_rpm "rustdesk/rustdesk"
+
 
 echo "==> 3/5: INSTALLING FLATPAKS..."
 
@@ -86,6 +121,8 @@ FLATPAKS=(
     # Adjust these App IDs to your liking
     it.mijorus.gearlever
     dev.goats.xivlauncher
+    com.teamspeak.TeamSpeak
+    io.github.flattool.Warehouse
 )
 
 echo "  -> Installing Flatpak applications..."
