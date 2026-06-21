@@ -102,7 +102,7 @@ dracut -f --regenerate-all
 echo "  -> Enabling LACT Daemon..."
 systemctl enable --now lactd
 
-echo "  -> Configuring Wake-on-LAN (WoL)..."
+echo "  -> Configuring Wake-on-LAN..."
 ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
 
 if [ -n "$ETH_INTERFACE" ]; then
