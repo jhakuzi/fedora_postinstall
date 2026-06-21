@@ -51,7 +51,6 @@ PACKAGES=(
     kate
     steam
     wine
-    wine-devel
     btrfs-assistant
     vlc
     
