@@ -100,6 +100,7 @@ PACKAGES=(
     jq
     curl
     krita
+    gnome-boxes
     flatpak
     
     # CachyOS Kernel
