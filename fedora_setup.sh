@@ -17,7 +17,6 @@ PACKAGES=(
     kate
     steam
     wine
-    wine-devel
     btrfs-assistant
     vlc
 )
@@ -80,10 +79,6 @@ echo "==> Installing LACT (AMD Linux App)..."
 dnf copr enable -y ilyaz/LACT
 dnf install -y lact
 systemctl enable --now lactd
-
-echo "==> Installing xpadneo..."
-dnf copr enable -y atim/xpadneo
-dnf install -y xpadneo
 
 echo "==> Installing Plasma AppGrid..."
 dnf copr enable -y scujas/plasma-applet-appgrid
