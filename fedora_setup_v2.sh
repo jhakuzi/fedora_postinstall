@@ -49,6 +49,7 @@ dnf copr enable -y ilyaz/LACT
 dnf copr enable -y sentry/xpadneo
 dnf copr enable -y scujas/plasma-applet-appgrid
 dnf copr enable -y jhakuzi/opentrack-wine
+dnf copr enable -y lizardbyte/stable
 
 # Cider Repo
 rpm --import https://repo.cider.sh/RPM-GPG-KEY
@@ -81,6 +82,7 @@ PACKAGES=(
     vlc
     jq
     curl
+    krita
     flatpak  # Ensuring flatpak is present for the next step
     
     # CachyOS Kernel
@@ -100,6 +102,7 @@ PACKAGES=(
     plasma-applet-appgrid
     opentrack
     Cider
+    Sunshine
 )
 
 dnf install -y "${PACKAGES[@]}"
@@ -123,6 +126,7 @@ FLATPAKS=(
     dev.goats.xivlauncher # XIV Launcher
     com.teamspeak.TeamSpeak # Teamspeak
     io.github.flattool.Warehouse # Warehouse
+    io.github.CyberTimon.RapidRAW # Lightroom alternative
 )
 
 echo "  -> Installing Flatpak applications..."
