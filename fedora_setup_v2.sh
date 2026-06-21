@@ -7,7 +7,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-echo "==> 1/4: CONFIGURING REPOSITORIES..."
+echo "==> 1/5: CONFIGURING REPOSITORIES..."
 
 # Standard Repos
 dnf install -y \
@@ -39,7 +39,7 @@ echo "==> Updating system metadata..."
 dnf update -y
 
 
-echo "==> 2/4: INSTALLING PACKAGES..."
+echo "==> 2/5: INSTALLING DNF PACKAGES..."
 
 PACKAGES=(
     # Core Utilities & Apps
@@ -51,8 +51,10 @@ PACKAGES=(
     kate
     steam
     wine
+    wine-devel
     btrfs-assistant
     vlc
+    flatpak  # Ensuring flatpak is present for the next step
     
     # CachyOS Kernel
     kernel-cachyos
@@ -76,7 +78,22 @@ PACKAGES=(
 dnf install -y "${PACKAGES[@]}"
 
 
-echo "==> 3/4: POST-INSTALL CONFIGURATIONS..."
+echo "==> 3/5: INSTALLING FLATPAKS..."
+
+echo "  -> Setting up Flathub remote..."
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+FLATPAKS=(
+    # Adjust these App IDs to your liking
+    it.mijorus.gearlever
+    dev.goats.xivlauncher
+)
+
+echo "  -> Installing Flatpak applications..."
+flatpak install -y --noninteractive flathub "${FLATPAKS[@]}"
+
+
+echo "==> 4/5: POST-INSTALL CONFIGURATIONS..."
 
 echo "  -> Swapping to CachyOS settings..."
 dnf swap -y zram-generator-defaults cachyos-settings --allowerasing || true
@@ -102,7 +119,7 @@ dracut -f --regenerate-all
 echo "  -> Enabling LACT Daemon..."
 systemctl enable --now lactd
 
-echo "  -> Configuring Wake-on-LAN..."
+echo "  -> Configuring Wake-on-LAN (WoL)..."
 ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
 
 if [ -n "$ETH_INTERFACE" ]; then
@@ -122,7 +139,7 @@ else
 fi
 
 
-echo "==> 4/4: CLEANUP..."
+echo "==> 5/5: CLEANUP..."
 
 dnf autoremove -y
 dnf clean all
