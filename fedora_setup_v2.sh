@@ -51,7 +51,6 @@ PACKAGES=(
     kate
     steam
     wine
-    wine-devel
     btrfs-assistant
     vlc
     flatpak  # Ensuring flatpak is present for the next step
