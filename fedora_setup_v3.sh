@@ -128,10 +128,10 @@ dnf install -y --setopt=strict=0 --skip-broken "${PACKAGES[@]}" || true
 
 echo "==> 2.5/5: INSTALLING DYNAMIC GITHUB RPMs..."
 
-# Flatpaks
+# Install custom .rpm
 install_latest_github_rpm "Vencord/Vesktop" # Vesktop (Discord)
 install_latest_github_rpm "rmcrackan/libation" # Libation for Audible
-install_latest_github_rpm "rustdesk/rustdesk" # Rustdesk for remote
+# install_latest_github_rpm "rustdesk/rustdesk" # Rustdesk for remote (currently not working)
 
 
 echo "==> 3/5: INSTALLING FLATPAKS..."
@@ -145,6 +145,7 @@ FLATPAKS=(
     com.teamspeak.TeamSpeak # Teamspeak
     io.github.flattool.Warehouse # Warehouse
     io.github.CyberTimon.RapidRAW # Lightroom alternative
+    com.rustdesk.RustDesk # Rustdesk remote desktop
 )
 
 echo "  -> Installing Flatpak applications..."
