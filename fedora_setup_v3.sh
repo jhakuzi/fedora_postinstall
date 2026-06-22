@@ -184,21 +184,33 @@ systemctl enable --now lactd
 echo "  -> Configuring Wake-on-LAN..."
 ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
 
+echo "  -> Configuring Wake-on-LAN..."
+ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
+
 if [ -n "$ETH_INTERFACE" ]; then
     echo "    Found Ethernet interface: $ETH_INTERFACE"
-    ethtool -s "$ETH_INTERFACE" wol g
-
-    CONN_NAME=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$ETH_INTERFACE$" | cut -d: -f1)
-
-    if [ -n "$CONN_NAME" ]; then
-        echo "    Applying WoL to NetworkManager connection: $CONN_NAME"
-        nmcli connection modify "$CONN_NAME" 802-3-ethernet.wake-on-lan magic
+    
+    # failsafe
+    if ethtool -s "$ETH_INTERFACE" wol g 2>/dev/null; then
+        echo "    Successfully enabled WoL via ethtool."
+        
+        CONN_NAME=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$ETH_INTERFACE$" | cut -d: -f1)
+        
+        if [ -n "$CONN_NAME" ]; then
+            echo "    Applying WoL to NetworkManager connection: $CONN_NAME"
+            # Append || true so nm failing doesn't exit
+            nmcli connection modify "$CONN_NAME" 802-3-ethernet.wake-on-lan magic || echo "    WARNING: NetworkManager WoL modification failed."
+        else
+            echo "    WARNING: Could not determine active NetworkManager connection name. Skipping NM WoL config."
+        fi
     else
-        echo "    WARNING: Could not determine active NetworkManager connection name. Skipping NM WoL config."
+        # error trigger in on unsupported hardware without exit
+        echo "    WARNING: ethtool could not enable WoL on $ETH_INTERFACE (This is normal in VMs or unsupported NICs)."
     fi
 else
     echo "    WARNING: Active Ethernet interface could not be determined. Skipping WoL config."
 fi
+
 
 
 echo "==> 5/5: CLEANUP & VERIFICATION..."
