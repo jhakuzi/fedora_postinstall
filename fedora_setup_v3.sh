@@ -45,7 +45,7 @@ dnf install -y \
     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-# COPR Repos
+# COPR
 dnf copr enable -y bieszczaders/kernel-cachyos
 dnf copr enable -y bieszczaders/kernel-cachyos-addons
 dnf copr enable -y faugus/faugus-launcher
@@ -86,7 +86,7 @@ dnf install -y mesa-va-drivers-freeworld || FAILED_DNF+=("mesa-va-drivers-freewo
 echo "==> 2/5: INSTALLING DNF PACKAGES..."
 
 PACKAGES=(
-    # Standard Apps
+    # Standard apps
     btop
     fastfetch
     thunderbird
@@ -103,16 +103,16 @@ PACKAGES=(
     gnome-boxes
     flatpak
     
-    # CachyOS Kernel
+    # CachyOS kernel
     kernel-cachyos
     kernel-cachyos-devel-matched
 
-    # SCX Schedulers
+    # CachyOS tools
     scx-scheds
     scx-tools
     scx-manager
 
-    # COPR Apps
+    # COPR apps
     faugus-launcher
     lug-helper
     lact
@@ -163,7 +163,7 @@ dnf swap -y zram-generator-defaults cachyos-settings --allowerasing || true
 echo "  -> Updating SELinux policy for kernel modules..."
 setsebool -P domain_kernel_load_modules on
 
-echo "  -> Creating kernel post-install hook for grubby..."
+echo "  -> Creating kernel post-install hook for GRUB..."
 mkdir -p /etc/kernel/postinst.d
 tee /etc/kernel/postinst.d/99-default << 'EOF'
 #!/bin/sh
@@ -178,11 +178,8 @@ chmod u+rx /etc/kernel/postinst.d/99-default
 echo "  -> Rebuilding initramfs with new kernel settings..."
 dracut -f --regenerate-all
 
-echo "  -> Enabling LACT Daemon..."
+echo "  -> Enabling LACT daemon..."
 systemctl enable --now lactd
-
-echo "  -> Configuring Wake-on-LAN..."
-ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
 
 echo "  -> Configuring Wake-on-LAN..."
 ETH_INTERFACE=$(nmcli -t -f DEVICE,TYPE device status | grep ':ethernet' | head -n1 | cut -d: -f1)
