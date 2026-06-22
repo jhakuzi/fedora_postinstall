@@ -253,4 +253,4 @@ else
 fi
 
 echo "================================================================"
-echo "==> Setup complete! Please reboot your system to initialize everything."
+echo "==> Setup complete! Please reboot!"
