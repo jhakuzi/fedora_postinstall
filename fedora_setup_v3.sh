@@ -209,6 +209,40 @@ else
     echo "    WARNING: Active Ethernet interface could not be determined. Skipping WoL config."
 fi
 
+echo "  -> Configuring Logitech G600 side buttons (KP1-KP9) if connected..."
+(
+    set +e
+    if ! command -v ratbagctl >/dev/null 2>&1; then
+        echo "    Skipping: ratbagctl not found (piper/libratbag missing)."
+        exit 0
+    fi
+
+    systemctl start ratbagd >/dev/null 2>&1
+    sleep 1
+
+    if ! ratbagctl list 2>/dev/null | grep -qi 'G600'; then
+        echo "    Skipping: Logitech G600 not detected."
+        exit 0
+    fi
+
+    echo "    G600 found, mapping G9-G17 to KEY_KP1-KEY_KP9..."
+    ok=1
+    i=1
+    for btn in 8 9 10 11 12 13 14 15 16; do
+        if ! ratbagctl G600 profile 0 button "$btn" action set macro "KEY_KP$i" >/dev/null 2>&1; then
+            echo "    WARNING: Failed to map button $btn (G$((btn+1))) to KEY_KP$i."
+            ok=0
+        fi
+        i=$((i + 1))
+    done
+
+    if [ "$ok" -eq 1 ]; then
+        echo "    G600 numpad mapping applied."
+    else
+        echo "    G600 mapping incomplete; skipped remaining errors."
+    fi
+) || echo "    Skipping: G600 configuration failed."
+
 
 
 echo "==> 5/5: CLEANUP & VERIFICATION..."
