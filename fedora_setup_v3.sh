@@ -102,6 +102,7 @@ PACKAGES=(
     krita
     gnome-boxes
     flatpak
+    piper
     
     # CachyOS kernel
     kernel-cachyos
